@@ -1,0 +1,81 @@
+<h1>To Do Lista</h1>
+<div>
+  <input id="todo-input" placeholder="Nova tarefa" />
+  <button onclick="addTodo()">Adicionar tarefa</button>
+</div>
+<ul id="todo-list"></ul>
+
+<hr />
+
+<h1>Usuários</h1>
+<div>
+  <input id="name" placeholder="Nome" />
+  <button onclick="createUser()">Criar usuário</button>
+</div>
+<ul id="user-list"></ul>
+
+<script>
+const todos = [];
+
+function renderTodos() {
+  const list = document.getElementById('todo-list');
+  list.innerHTML = '';
+
+  todos.forEach((todo, index) => {
+    const item = document.createElement('li');
+    item.textContent = todo.text;
+
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remover';
+    removeButton.style.marginLeft = '10px';
+    removeButton.onclick = () => {
+      todos.splice(index, 1);
+      renderTodos();
+    };
+
+    item.appendChild(removeButton);
+    list.appendChild(item);
+  });
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  todos.push({ text });
+  input.value = '';
+  renderTodos();
+}
+
+async function loadUsers() {
+  const res = await fetch('/api/users');
+  const data = await res.json();
+
+  const list = document.getElementById('user-list');
+  list.innerHTML = '';
+
+  data.forEach(user => {
+    const item = document.createElement('li');
+    item.textContent = `${user.id}: ${user.user}`;
+    list.appendChild(item);
+  });
+}
+
+async function createUser() {
+  const name = document.getElementById('name').value.trim();
+  if (!name) return;
+
+  await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  });
+
+  document.getElementById('name').value = '';
+  loadUsers();
+}
+
+loadUsers();
+renderTodos();
+</script>

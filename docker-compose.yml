@@ -1,0 +1,40 @@
+version: "1.0"
+
+services:
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: teste
+      DB_NAME: teste
+    depends_on:
+      - mysql
+
+  mysql:
+    build: ./mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: teste
+      MYSQL_DATABASE: teste
+    ports: 
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mysql_data:
