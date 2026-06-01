@@ -1,40 +1,107 @@
-version: "3.9"
-
 services:
 
-  frontend:
-    build: ./frontend
-    depends_on:
-      - backend
+  # =========================================================
+  # 🗄️ MYSQL - Banco de dados principal da aplicação
+  #
+  # Responsável por armazenar todos os dados persistentes
+  # da aplicação (usuários, registros, etc).
+  #
+  # O volume garante que os dados não sejam perdidos
+  # ao reiniciar o container.
+  # =========================================================
+  mysql:
+    build: ./mysql
 
+    restart: always
+
+    # Configuração inicial do banco de dados
+    environment:
+      MYSQL_ROOT_PASSWORD: teste   # senha do usuário root
+      MYSQL_DATABASE: teste        # banco criado automaticamente no start
+
+    # Porta exposta para acesso externo (útil para debug local)
+    ports:
+      - "3307:3306"
+
+    # Persistência de dados do banco
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    # Healthcheck:
+    # Garante que o MySQL não apenas iniciou,
+    # mas também está pronto para aceitar conexões.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s        # tempo entre verificações
+      timeout: 3s         # tempo máximo de resposta
+      retries: 5          # número de tentativas antes de falhar
+      start_period: 10s   # tempo inicial de boot antes de checar
+
+
+  # =========================================================
+  # ⚙️ BACKEND - API principal da aplicação
+  #
+  # Responsável pela lógica de negócio e comunicação com o banco.
+  #
+  # Depende do MySQL para funcionar corretamente.
+  # =========================================================
   backend:
     build: ./backend
+
+    restart: always
+
+    # Variáveis de ambiente para conexão com o banco
     environment:
       DB_HOST: mysql
       DB_USER: root
       DB_PASSWORD: teste
       DB_NAME: teste
+
+    # Garante que o banco esteja saudável antes de iniciar o backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
-  mysql:
-    build: ./mysql
+
+  # =========================================================
+  # 🎨 FRONTEND - Interface da aplicação
+  #
+  # Responsável pela camada visual da aplicação (UI/UX).
+  # =========================================================
+  frontend:
+    build: ./frontend
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: teste
-      MYSQL_DATABASE: teste
-    ports: 
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
 
+
+  # =========================================================
+  # 🌐 NGINX - Proxy reverso (gateway da aplicação)
+  #
+  # Responsável por:
+  # - Receber requisições externas
+  # - Direcionar para frontend ou backend
+  # =========================================================
   nginx:
     build: ./nginx
+
+    restart: always
+
+    # Porta pública da aplicação
     ports:
       - "80:80"
-    depends_on:
-      - frontend
-      - backend
 
+    # Garante que frontend e backend estejam iniciados
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+
+
+# =========================================================
+# 💾 VOLUMES - Persistência de dados
+#
+# Armazena os dados do MySQL fora do container,
+# evitando perda em reinicializações.
+# =========================================================
 volumes:
   mysql_data:
