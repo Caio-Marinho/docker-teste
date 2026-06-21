@@ -1,81 +1,83 @@
-<h1>To Do Lista</h1>
-<div>
-  <input id="todo-input" placeholder="Nova tarefa" />
-  <button onclick="addTodo()">Adicionar tarefa</button>
-</div>
-<ul id="todo-list"></ul>
-
-<hr />
-
 <h1>Usuários</h1>
 <div>
   <input id="name" placeholder="Nome" />
   <button onclick="createUser()">Criar usuário</button>
 </div>
-<ul id="user-list"></ul>
+<ol id="user-list"></ol>
 
 <script>
-const todos = [];
-
-function renderTodos() {
-  const list = document.getElementById('todo-list');
-  list.innerHTML = '';
-
-  todos.forEach((todo, index) => {
-    const item = document.createElement('li');
-    item.textContent = todo.text;
-
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remover';
-    removeButton.style.marginLeft = '10px';
-    removeButton.onclick = () => {
-      todos.splice(index, 1);
-      renderTodos();
-    };
-
-    item.appendChild(removeButton);
-    list.appendChild(item);
-  });
-}
-
-function addTodo() {
-  const input = document.getElementById('todo-input');
-  const text = input.value.trim();
-  if (!text) return;
-
-  todos.push({ text });
-  input.value = '';
-  renderTodos();
-}
-
+// --- FUNÇÃO 1: BUSCAR E EXIBIR USUÁRIOS ---
 async function loadUsers() {
+  // Faz uma requisição GET para o Nginx buscar a lista de usuários no banco
   const res = await fetch('/api/users');
+  // Transforma a resposta do servidor em formato JSON (lista de objetos)
   const data = await res.json();
 
+  // Pega a nossa lista (<ul>) do HTML usando o ID dela
   const list = document.getElementById('user-list');
+  // Limpa tudo o que estiver dentro da lista para não duplicar os dados antigos
   list.innerHTML = '';
 
+  // Passa por cada usuário retornado pelo banco de dados
   data.forEach(user => {
+    // Cria um elemento de linha (<li>) na memória do navegador
     const item = document.createElement('li');
-    item.textContent = `${user.id}: ${user.user}`;
+    // Define o texto que vai aparecer na linha (Ex: "1: Caio")
+    item.textContent = `${user.user}`;
+
+    // Cria um elemento de botão (<button>) na memória
+    const removeButton = document.createElement('button');
+    // Define o texto visível dentro do botão
+    removeButton.textContent = 'Remover';
+    // Adiciona um pequeno espaço à esquerda do botão para desgrudar do texto
+    removeButton.style.marginLeft = '10px';
+    
+    // Configura o que acontece ao clicar no botão: chama a função de deletar passando o ID deste usuário
+    removeButton.onclick = () => deleteUser(user.id);
+
+    // Coloca o botão de remover dentro da linha do usuário (<li>)
+    item.appendChild(removeButton);
+    // Coloca a linha completa dentro da nossa lista principal (<ul>) na tela
     list.appendChild(item);
   });
 }
 
+// --- FUNÇÃO 2: CRIAR UM NOVO USUÁRIO ---
 async function createUser() {
-  const name = document.getElementById('name').value.trim();
+  // Pega o campo de texto (input) do HTML
+  const nameInput = document.getElementById('name');
+  // Pega o valor digitado e remove os espaços em branco do início e do fim (.trim)
+  const name = nameInput.value.trim();
+  // Se o campo estiver vazio, interrompe a função e não faz nada
   if (!name) return;
 
+  // Envia os dados para o Nginx usando o método POST
   await fetch('/api/users', {
     method: 'POST',
+    // Avisa o servidor que estamos enviando dados em formato JSON
     headers: { 'Content-Type': 'application/json' },
+    // Transforma o nosso objeto JavaScript em um texto JSON válido
     body: JSON.stringify({ name })
   });
 
-  document.getElementById('name').value = '';
+  // Limpa a caixinha de texto na tela para o usuário poder digitar outro nome
+  nameInput.value = '';
+  // Chama a função de listar para atualizar a tela com o novo usuário inserido
   loadUsers();
 }
 
+// --- FUNÇÃO 3: DELETAR UM USUÁRIO ---
+async function deleteUser(id) {
+  // Faz uma requisição DELETE enviando o ID do usuário direto na URL (Ex: /api/users/5)
+  await fetch(`/api/users/${id}`, {
+    method: 'DELETE'
+  });
+
+  // Recarrega a lista na tela para sumir com o usuário que acabou de ser apagado
+  loadUsers();
+}
+
+// --- INICIALIZAÇÃO DA PÁGINA ---
+// Executa essa função automaticamente assim que a página é aberta no navegador
 loadUsers();
-renderTodos();
 </script>

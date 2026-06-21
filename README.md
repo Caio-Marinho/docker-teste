@@ -14,6 +14,7 @@ Este é um projeto de teste para Docker que demonstra a integração de um front
 
 - Criação de usuários via formulário no frontend.
 - Listagem de usuários retornados pela API `/api/users`.
+- Delete de usuários pela API `/api/users/id`.
 - Lista de tarefas local no frontend para demonstração de interação no navegador.
 - Configuração de múltiplos serviços dockerizados.
 
@@ -42,13 +43,13 @@ docker-compose up --build
 - Parar os containers e a rede:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 - Parar e remover containers, redes, volumes e imagens criadas pelo Compose:
 
 ```bash
-docker-compose down --volumes --rmi all
+docker compose down --volumes --rmi all
 ```
 
 - Limpar espaço adicional do Docker (use com cuidado, pois remove imagens e volumes não utilizados):

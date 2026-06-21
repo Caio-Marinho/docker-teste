@@ -34,6 +34,16 @@ def create_user():
     cur.execute("INSERT INTO users (name) VALUES (%s)", (name,))
     conn.commit()
 
-    return jsonify({"status": "ok"})
+    return jsonify({"status": "created"})
+
+@app.route("/users/<int:id>", methods=["DELETE"])
+def delete_user(id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM users WHERE id=%s", (id,))
+    conn.commit()
+
+    return jsonify({"status": "deletado"})
 
 app.run(host="0.0.0.0", port=5000)
