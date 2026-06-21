@@ -30,7 +30,7 @@ Este é um projeto de teste para Docker que demonstra a integração de um front
 3. Execute o comando abaixo para iniciar todos os serviços com Docker Compose:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 4. Acesse `http://localhost` no navegador.
