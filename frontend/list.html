@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Atividades | Sistema</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">Cadastrar</a>
+        <a href="list.html">Controle de Atividades</a>
+    </nav>
+
+    <div class="main-wrapper">
+        <h1>Planilha de Controle de Atividades</h1>
+        
+        <div class="filter-container">
+            <input type="text" id="search-employee" placeholder="🔍 Pesquisar pelo nome do funcionário..." oninput="filterActivities()">
+            <button type="button" id="openFilterModalBtn" class="btn-filter" onclick="openFilterModal()">Filtrar</button>
+            <div id="filter-chip-container" class="filter-chip-container"></div>
+        </div>
+
+        <p style="text-align: center;"><small>💡 Dica: Clique em qualquer linha para atualizar o status ou dados da atividade.</small></p>
+
+        <section id="section-activity">
+            <h2>Relatório Consolidado de Atividades</h2>
+            <table id="table-activities">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Responsável</th>
+                        <th>Atividade</th>
+                        <th>Descrição</th>
+                        <th>Setor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Carregado via JS -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <div id="filterModal" class="modal">
+        <div class="modal-content filter-modal-content">
+            <span class="close-modal" onclick="closeFilterModal()">&times;</span>
+            <div class="modal-header">
+                <h3>Filtrar por status e setor</h3>
+            </div>
+            <div class="modal-body">
+                <div class="filter-modal-section">
+                    <h4>Status</h4>
+                    <div id="filter-status-options" class="filter-option-list"></div>
+                </div>
+                <div class="filter-modal-section">
+                    <h4>Setor</h4>
+                    <div id="filter-department-options" class="filter-option-list"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeFilterModal()">Cancelar</button>
+                <button class="btn-save" onclick="applyFilterSelections()">Aplicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h3 id="modalTitle">Atualizar Atividade</h3>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo dinâmico -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Descartar</button>
+                <button class="btn-save" id="btnSave">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/list.js"></script>
+</body>
+</html>

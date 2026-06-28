@@ -1,83 +1,96 @@
-<h1>Usuários</h1>
-<div>
-  <input id="name" placeholder="Nome" />
-  <button onclick="createUser()">Criar usuário</button>
-</div>
-<ol id="user-list"></ol>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | Sistema de Gestão</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
 
-<script>
-// --- FUNÇÃO 1: BUSCAR E EXIBIR USUÁRIOS ---
-async function loadUsers() {
-  // Faz uma requisição GET para o Nginx buscar a lista de usuários no banco
-  const res = await fetch('/api/users');
-  // Transforma a resposta do servidor em formato JSON (lista de objetos)
-  const data = await res.json();
+    <nav>
+        <a href="index.html">Cadastrar</a>
+        <a href="list.html">Controle de Atividades</a>
+    </nav>
 
-  // Pega a nossa lista (<ul>) do HTML usando o ID dela
-  const list = document.getElementById('user-list');
-  // Limpa tudo o que estiver dentro da lista para não duplicar os dados antigos
-  list.innerHTML = '';
+    <div class="main-wrapper">
+        <h1>Gerenciamento de Cadastro</h1>
 
-  // Passa por cada usuário retornado pelo banco de dados
-  data.forEach(user => {
-    // Cria um elemento de linha (<li>) na memória do navegador
-    const item = document.createElement('li');
-    // Define o texto que vai aparecer na linha (Ex: "Caio")
-    item.textContent = `${user.user}`;
+        <div class="selector-container">
+            <label for="form-selector">O que você deseja cadastrar?</label>
+            <select id="form-selector">
+                <option value="">Selecione uma categoria...</option>
+                <option value="dept">Novo Departamento</option>
+                <option value="user">Novo Usuário</option>
+                <option value="task">Nova Tarefa (Atividade)</option>
+            </select>
+        </div>
 
-    // Cria um elemento de botão (<button>) na memória
-    const removeButton = document.createElement('button');
-    // Define o texto visível dentro do botão
-    removeButton.textContent = 'Remover';
-    // Adiciona um pequeno espaço à esquerda do botão para desgrudar do texto
-    removeButton.style.marginLeft = '10px';
-    
-    // Configura o que acontece ao clicar no botão: chama a função de deletar passando o ID deste usuário
-    removeButton.onclick = () => deleteUser(user.id);
+        <!-- 1. DEPARTAMENTOS -->
+        <section id="section-dept" class="hidden form-section">
+            <h2>Cadastrar Departamento</h2>
+            <div class="form-content">
+                <div class="form-group">
+                    <label>Nome do Departamento</label>
+                    <input id="dept-name" placeholder="Ex: Financeiro, Marketing..." />
+                </div>
+                <button onclick="createDepartment()">Finalizar Cadastro</button>
+            </div>
+        </section>
 
-    // Coloca o botão de remover dentro da linha do usuário (<li>)
-    item.appendChild(removeButton);
-    // Coloca a linha completa dentro da nossa lista principal (<ul>) na tela
-    list.appendChild(item);
-  });
-}
+        <!-- 2. USUÁRIOS -->
+        <section id="section-user" class="hidden form-section">
+            <h2>Cadastrar Usuário</h2>
+            <div class="form-content">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input id="user-name" placeholder="Digite o nome..." />
+                    
+                    <label>E-mail Corporativo</label>
+                    <input id="user-email" type="email" placeholder="exemplo@empresa.com" />
+                    
+                    <label>Data de Nascimento</label>
+                    <input id="user-birth" type="date" />
+                    
+                    <label>Idade</label>
+                    <input id="user-age" type="number" placeholder="0" />
+                    
+                    <label>Departamento de Alocação</label>
+                    <select id="user-dept">
+                        <option value="">Carregando opções...</option>
+                    </select>
+                </div>
+                <button onclick="createUser()">Finalizar Cadastro</button>
+            </div>
+        </section>
 
-// --- FUNÇÃO 2: CRIAR UM NOVO USUÁRIO ---
-async function createUser() {
-  // Pega o campo de texto (input) do HTML
-  const nameInput = document.getElementById('name');
-  // Pega o valor digitado e remove os espaços em branco do início e do fim (.trim)
-  const name = nameInput.value.trim();
-  // Se o campo estiver vazio, interrompe a função e não faz nada
-  if (!name) return;
+        <!-- 3. TAREFAS -->
+        <section id="section-task" class="hidden form-section">
+            <h2>Cadastrar Nova Atividade</h2>
+            <div class="form-content">
+                <div class="form-group">
+                    <label>Título da Atividade</label>
+                    <input id="task-title" placeholder="O que precisa ser feito?" />
+                    
+                    <label>Descrição Detalhada</label>
+                    <textarea id="task-desc" rows="3" placeholder="Detalhes da tarefa..."></textarea>
+                    
+                    <label>Colaborador Responsável</label>
+                    <select id="task-user">
+                        <option value="">Carregando opções...</option>
+                    </select>
 
-  // Envia os dados para o Nginx usando o método POST
-  await fetch('/api/users', {
-    method: 'POST',
-    // Avisa o servidor que estamos enviando dados em formato JSON
-    headers: { 'Content-Type': 'application/json' },
-    // Transforma o nosso objeto JavaScript em um texto JSON válido
-    body: JSON.stringify({ name })
-  });
+                    <label>Status Inicial</label>
+                    <select id="task-status">
+                        <option value="">Carregando opções...</option>
+                    </select>
+                </div>
+                <button onclick="createTask()">Finalizar Cadastro</button>
+            </div>
+        </section>
+    </div>
 
-  // Limpa a caixinha de texto na tela para o usuário poder digitar outro nome
-  nameInput.value = '';
-  // Chama a função de listar para atualizar a tela com o novo usuário inserido
-  loadUsers();
-}
-
-// --- FUNÇÃO 3: DELETAR UM USUÁRIO ---
-async function deleteUser(id) {
-  // Faz uma requisição DELETE enviando o ID do usuário direto na URL (Ex: /api/users/5)
-  await fetch(`/api/users/${id}`, {
-    method: 'DELETE'
-  });
-
-  // Recarrega a lista na tela para sumir com o usuário que acabou de ser apagado
-  loadUsers();
-}
-
-// --- INICIALIZAÇÃO DA PÁGINA ---
-// Executa essa função automaticamente assim que a página é aberta no navegador
-loadUsers();
-</script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/register.js"></script>
+</body>
+</html>

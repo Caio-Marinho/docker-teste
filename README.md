@@ -4,19 +4,20 @@ Este é um projeto de teste para Docker que demonstra a integração de um front
 
 ## O que é este projeto?
 
-- Um exemplo simples de aplicação em contêineres.
-- Backend em Flask que expõe uma API de usuários em `/users`.
-- Frontend estático que consome a API e exibe os usuários.
-- Banco de dados MySQL para armazenar os usuários.
-- Nginx como proxy reverso para atender o frontend e encaminhar chamadas `/api/` ao backend.
+- Uma aplicação em contêineres com frontend, backend, banco de dados MySQL e proxy Nginx.
+- O backend é desenvolvido em Flask e expõe endpoints para gerenciar departamentos, usuários, status e tarefas.
+- O frontend é uma interface estática em HTML, CSS e JavaScript para cadastrar, listar e editar atividades.
+- O MySQL armazena os dados principais do sistema.
+- O Nginx atua como ponto de entrada da aplicação e encaminha as requisições para o backend.
 
 ## Funcionalidades
 
-- Criação de usuários via formulário no frontend.
-- Listagem de usuários retornados pela API `/api/users`.
-- Delete de usuários pela API `/api/users/id`.
-- Lista de tarefas local no frontend para demonstração de interação no navegador.
-- Configuração de múltiplos serviços dockerizados.
+- Cadastro de departamentos, usuários e atividades.
+- Listagem consolidada das atividades com visualização em tabela.
+- Edição de atividades diretamente pela interface.
+- Filtro dinâmico por meio de um botão que abre um modal para selecionar status e setores.
+- Suporte a múltiplos filtros simultâneos, com a opção de deixar todos os valores vazios para exibir toda a tabela.
+- Organização do projeto em containers Docker para facilitar execução e desenvolvimento.
 
 ## Como usar
 
