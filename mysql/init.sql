@@ -1,4 +1,6 @@
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100)
+    nome VARCHAR(255),
+    data_nacimento DATE,
+    idade INT,
 );
